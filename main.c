@@ -602,7 +602,7 @@ void MemberLogIn(){
     struct session s ;
     struct computer p ;
     int a ;
-    char c , r = 'N' ;
+    char rl = 'N' , r = 'N' ;
     show_all_pc();
     do {
             do{
@@ -615,13 +615,14 @@ void MemberLogIn(){
                     do{
                             printf("wanna Retry (Y/N)? \n");
                             scanf(" %c",&r);
+                            getchar();
                     } while((toupper(r) != 'Y') && (toupper(r) != 'N' )) ;
                     if ((toupper(r) == 'N')){
                             booking();
                             return;
                     }
             }
-    } while (toupper(r) == 'Y' );
+    } while ( (a != 1) && toupper(r) == 'Y' );
     FILE *fm , *fs, *fpc , *fc;
     fc = fopen("computer.txt","r");
     fpc = fopen("pc.txt","w");
@@ -629,8 +630,13 @@ void MemberLogIn(){
     fm = fopen("member.txt","r");
     if ((fm == NULL) || (fc == NULL) || (fs == NULL) || (fpc == NULL)) {
             printf("Error: Could not open required files. Make sure the files exist.\n");
+            if (fm) fclose(fm);
+            if (fs) fclose(fs);
+            if (fc) fclose(fc);
+            if (fpc) fclose(fpc);
             return;
     }
+
     int found = 0 ;
     do {
             printf(" \n                                          * Enter the User CIN :  ");
@@ -645,30 +651,43 @@ void MemberLogIn(){
                         break ;
                     }
             }
-            fclose(fm);
-            if (found == 0){
-                printf ("user name or password incorrect ! Retry ");
-            }
-            else {
-                s.CIN = CIN ;
-                s.code = code ;
-                s.login = time (NULL);
-                s.logout = 0 ;
-                s.charges = 0 ;
-                fprintf(fs,"%d     %d     %ld     %ld     %3.f \n",  s.CIN ,s.code, s.login , s.logout , s.charges);
-                printf("successfully loged in ");
-                while ((fscanf(fc,"%d     %s     %s     %s     %s",&p.code , p.name , p.memory , p.model , p.status))!= EOF) {
-                        if (code == p.code) {
-                            strcpy(p.status,"in use");
-                        }
-                        fprintf(fpc ,"%d     %s     %s     %s     %s \n",p.code , p.name , p.memory , p.model , p.status);
-                }
-                fclose(fc);
-                fclose(fpc);
-                remove("computer.txt");
-                rename("pc.txt", "computer.txt");
-            }
-    } while ( found == 0 );
+
+        if (!found) {
+            printf("Username or password incorrect. Retry (Y/N)? ");
+            scanf(" %c", &rl);
+            getchar(); // Clear newline character
+            rewind(fm); // Reset file pointer for retry
+        }
+    } while (!found && toupper(rl) == 'Y');
+
+    fclose(fm);
+
+    if (!found) {
+        printf("Login failed. Returning to main menu.\n");
+        return;
+    }
+    s.CIN = CIN;
+    s.code = code;
+    s.login = time(NULL);
+    s.logout = 0;
+    s.charges = 0.0; // Initial charges
+    fprintf(fs, "%d     %d      %ld     %ld      %.2f\n", s.CIN, s.code, s.login, s.logout, s.charges);
+    fclose(fs);
+    while (fscanf(fc, "%d     %s     %s     %s     %s", &p.code, p.name, p.memory, p.model, p.status) != EOF) {
+        if (code == p.code) {
+            strcpy(p.status, "in use"); // Set computer status to "in use"
+        }
+        fprintf(fpc, "%d     %s      %s      %s      %s\n", p.code, p.name, p.memory, p.model, p.status);
+    }
+
+    fclose(fc);
+    fclose(fpc);
+
+    // Replace the original computer file with the updated one
+    remove("computer.txt");
+    rename("pc.txt", "computer.txt");
+
+    printf("Successfully logged in.\n");
 }
 void MemberLogOut() {
 
