@@ -23,28 +23,20 @@ struct session {
     time_t login;
     time_t logout;
     float charges;
-
 };
-/ Define the person structure
 typedef struct {
     char name[50];
     int coffees_demanded;
     double credit_balance;
 } Person;
-
-// Queue element structure
 typedef struct _queue_element {
     void *content;
     struct _queue_element *next;
 } queue_element;
-
-// Queue structure
 typedef struct {
     queue_element *head, *tail;
     unsigned nb_values;
 } queue;
-
-// Function to add to the queue
 int queue_send(queue *q, void *p) {
     queue_element *e = malloc(sizeof(queue_element));
     if (!e)
@@ -894,10 +886,6 @@ void show_all_charges() {
         printf("No charges recorded in session.txt.\n");
     }
 }
-void prepareCoffee(int count) {
-    coffee_stock += count;
-    printf("%d coffee(s) prepared. Total coffee stock: %d\n", count, coffee_stock);
-}
 void displayQueue(queue *coffee_queue) {
     queue_element *current = coffee_queue->head;
     int total_coffees = 0;
@@ -917,8 +905,6 @@ void displayQueue(queue *coffee_queue) {
 
     printf("Total coffees demanded: %d\n", total_coffees);
 }
-
-// Function to serve coffee
 void serveCoffee(queue *coffee_queue) {
     if (!coffee_queue->nb_values) {
         printf("The queue is empty. No one to serve.\n");
@@ -1182,8 +1168,8 @@ void Menu(){
     printf("                                  |                                | \n");
     printf("                                   |   * 1-Master Entry.            | \n");
     printf("                                   |   * 2-Cafe Managment.          | \n");
-    printf("                                   |   * 3-Coffee  Service          | \n ")
-    printf("                                   |   * 3-Exit.                    | \n");
+    printf("                                   |   * 3-Coffee  Service          | \n ");
+    printf("                                   |   * 4-Exit.                    | \n");
     printf("                                   |________________________________| \n");
     do{
             printf ("\n                                      Select Your Choice :  ");
